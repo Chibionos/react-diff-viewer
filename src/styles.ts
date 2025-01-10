@@ -1,5 +1,6 @@
-import { css, cx } from 'emotion';
-import { Interpolation } from 'create-emotion';
+import { css } from '@emotion/react';
+import { cx } from '@emotion/css';
+import type { SerializedStyles } from '@emotion/react';
 
 export interface ReactDiffViewerStyles {
 	diffContainer?: string;
@@ -54,28 +55,56 @@ export interface ReactDiffViewerStylesVariables {
 
 export interface ReactDiffViewerStylesOverride {
 	variables?: {
-		dark?: ReactDiffViewerStylesVariables;
-		light?: ReactDiffViewerStylesVariables;
+		dark?: {
+			diffViewerBackground?: string;
+			diffViewerColor?: string;
+			addedBackground?: string;
+			addedColor?: string;
+			removedBackground?: string;
+			removedColor?: string;
+			wordAddedBackground?: string;
+			wordRemovedBackground?: string;
+			addedGutterBackground?: string;
+			removedGutterBackground?: string;
+			gutterBackground?: string;
+			gutterBackgroundDark?: string;
+			highlightBackground?: string;
+			highlightGutterBackground?: string;
+		};
+		light?: {
+			diffViewerBackground?: string;
+			diffViewerColor?: string;
+			addedBackground?: string;
+			addedColor?: string;
+			removedBackground?: string;
+			removedColor?: string;
+			wordAddedBackground?: string;
+			wordRemovedBackground?: string;
+			addedGutterBackground?: string;
+			removedGutterBackground?: string;
+			gutterBackground?: string;
+			gutterBackgroundDark?: string;
+			highlightBackground?: string;
+			highlightGutterBackground?: string;
+		};
 	};
-	diffContainer?: Interpolation;
-	diffRemoved?: Interpolation;
-	diffAdded?: Interpolation;
-	marker?: Interpolation;
-	emptyGutter?: Interpolation;
-	highlightedLine?: Interpolation;
-	lineNumber?: Interpolation;
-	highlightedGutter?: Interpolation;
-	contentText?: Interpolation;
-	gutter?: Interpolation;
-	line?: Interpolation;
-	wordDiff?: Interpolation;
-	wordAdded?: Interpolation;
-	wordRemoved?: Interpolation;
-	codeFoldGutter?: Interpolation;
-	emptyLine?: Interpolation;
-	content?: Interpolation;
-	titleBlock?: Interpolation;
-	splitView?: Interpolation;
+	diffContainer?: SerializedStyles;
+	diffRemoved?: SerializedStyles;
+	diffAdded?: SerializedStyles;
+	marker?: SerializedStyles;
+	emptyGutter?: SerializedStyles;
+	highlightedGutter?: SerializedStyles;
+	wordDiff?: SerializedStyles;
+	wordAdded?: SerializedStyles;
+	wordRemoved?: SerializedStyles;
+	codeFold?: SerializedStyles;
+	emptyLine?: SerializedStyles;
+	content?: SerializedStyles;
+	gutter?: SerializedStyles;
+	line?: SerializedStyles;
+	lineNumber?: SerializedStyles;
+	splitView?: SerializedStyles;
+	titleBlock?: SerializedStyles;
 }
 
 export default (

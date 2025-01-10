@@ -69,15 +69,14 @@ export interface ReactDiffViewerProps {
 }
 
 export interface ReactDiffViewerState {
-	// Array holding the expanded code folding.
-	expandedBlocks?: number[];
+	expandedBlocks: number[];
 }
 
 class DiffViewer extends React.Component<
 	ReactDiffViewerProps,
 	ReactDiffViewerState
 > {
-	private styles: ReactDiffViewerStyles;
+	private styles!: ReactDiffViewerStyles;
 
 	public static defaultProps: ReactDiffViewerProps = {
 		oldValue: '',
@@ -114,10 +113,10 @@ class DiffViewer extends React.Component<
 
 	public constructor(props: ReactDiffViewerProps) {
 		super(props);
-
 		this.state = {
 			expandedBlocks: [],
 		};
+		this.styles = this.computeStyles(props.styles || {}, props.useDarkTheme || false);
 	}
 
 	/**
@@ -164,9 +163,13 @@ class DiffViewer extends React.Component<
 	 *
 	 * @param id Line id of a line.
 	 */
-	private onLineNumberClickProxy = (id: string): any => {
+	private onLineNumberClickProxy = (id: string) => {
 		if (this.props.onLineNumberClick) {
-			return (e: any): void => this.props.onLineNumberClick(id, e);
+			return (e: React.MouseEvent<HTMLTableCellElement>): void => {
+				if (this.props.onLineNumberClick) {
+					this.props.onLineNumberClick(id, e);
+				}
+			};
 		}
 		return (): void => {};
 	};
@@ -183,14 +186,15 @@ class DiffViewer extends React.Component<
 	): JSX.Element[] => {
 		return diffArray.map(
 			(wordDiff, i): JSX.Element => {
+				const value = typeof wordDiff.value === 'string' ? wordDiff.value : '';
 				return (
 					<span
 						key={i}
 						className={cn(this.styles.wordDiff, {
-							[this.styles.wordAdded]: wordDiff.type === DiffType.ADDED,
-							[this.styles.wordRemoved]: wordDiff.type === DiffType.REMOVED,
+							[this.styles.wordAdded as string]: wordDiff.type === DiffType.ADDED,
+							[this.styles.wordRemoved as string]: wordDiff.type === DiffType.REMOVED,
 						})}>
-						{renderer ? renderer(wordDiff.value as string) : wordDiff.value}
+						{renderer ? renderer(value) : value}
 					</span>
 				);
 			},
@@ -211,18 +215,20 @@ class DiffViewer extends React.Component<
 	 * @param additionalPrefix Similar to prefix but for additional line number.
 	 */
 	private renderLine = (
-		lineNumber: number,
+		lineNumber: number | null,
 		type: DiffType,
 		prefix: LineNumberPrefix,
 		value: string | DiffInformation[],
-		additionalLineNumber?: number,
+		additionalLineNumber?: number | null,
 		additionalPrefix?: LineNumberPrefix,
 	): JSX.Element => {
-		const lineNumberTemplate = `${prefix}-${lineNumber}`;
-		const additionalLineNumberTemplate = `${additionalPrefix}-${additionalLineNumber}`;
+		const lineNumberTemplate = lineNumber ? `${prefix}-${lineNumber}` : '';
+		const additionalLineNumberTemplate = additionalLineNumber
+			? `${additionalPrefix}-${additionalLineNumber}`
+			: '';
 		const highlightLine =
-			this.props.highlightLines.includes(lineNumberTemplate) ||
-			this.props.highlightLines.includes(additionalLineNumberTemplate);
+			(this.props.highlightLines || []).includes(lineNumberTemplate) ||
+			(this.props.highlightLines || []).includes(additionalLineNumberTemplate);
 		const added = type === DiffType.ADDED;
 		const removed = type === DiffType.REMOVED;
 		let content;
@@ -238,39 +244,34 @@ class DiffViewer extends React.Component<
 			<React.Fragment>
 				{!this.props.hideLineNumbers && (
 					<td
-						onClick={
-							lineNumber && this.onLineNumberClickProxy(lineNumberTemplate)
-						}
+						onClick={lineNumber ? this.onLineNumberClickProxy(lineNumberTemplate) : undefined}
 						className={cn(this.styles.gutter, {
-							[this.styles.emptyGutter]: !lineNumber,
-							[this.styles.diffAdded]: added,
-							[this.styles.diffRemoved]: removed,
-							[this.styles.highlightedGutter]: highlightLine,
+							[this.styles.emptyGutter as string]: !lineNumber,
+							[this.styles.diffAdded as string]: added,
+							[this.styles.diffRemoved as string]: removed,
+							[this.styles.highlightedGutter as string]: highlightLine,
 						})}>
 						<pre className={this.styles.lineNumber}>{lineNumber}</pre>
 					</td>
 				)}
 				{!this.props.splitView && !this.props.hideLineNumbers && (
 					<td
-						onClick={
-							additionalLineNumber &&
-							this.onLineNumberClickProxy(additionalLineNumberTemplate)
-						}
+						onClick={additionalLineNumber ? this.onLineNumberClickProxy(additionalLineNumberTemplate) : undefined}
 						className={cn(this.styles.gutter, {
-							[this.styles.emptyGutter]: !additionalLineNumber,
-							[this.styles.diffAdded]: added,
-							[this.styles.diffRemoved]: removed,
-							[this.styles.highlightedGutter]: highlightLine,
+							[this.styles.emptyGutter as string]: !additionalLineNumber,
+							[this.styles.diffAdded as string]: added,
+							[this.styles.diffRemoved as string]: removed,
+							[this.styles.highlightedGutter as string]: highlightLine,
 						})}>
 						<pre className={this.styles.lineNumber}>{additionalLineNumber}</pre>
 					</td>
 				)}
 				<td
 					className={cn(this.styles.marker, {
-						[this.styles.emptyLine]: !content,
-						[this.styles.diffAdded]: added,
-						[this.styles.diffRemoved]: removed,
-						[this.styles.highlightedLine]: highlightLine,
+						[this.styles.emptyLine as string]: !content,
+						[this.styles.diffAdded as string]: added,
+						[this.styles.diffRemoved as string]: removed,
+						[this.styles.highlightedLine as string]: highlightLine,
 					})}>
 					<pre>
 						{added && '+'}
@@ -279,10 +280,10 @@ class DiffViewer extends React.Component<
 				</td>
 				<td
 					className={cn(this.styles.content, {
-						[this.styles.emptyLine]: !content,
-						[this.styles.diffAdded]: added,
-						[this.styles.diffRemoved]: removed,
-						[this.styles.highlightedLine]: highlightLine,
+						[this.styles.emptyLine as string]: !content,
+						[this.styles.diffAdded as string]: added,
+						[this.styles.diffRemoved as string]: removed,
+						[this.styles.highlightedLine as string]: highlightLine,
 					})}>
 					<pre className={this.styles.contentText}>{content}</pre>
 				</td>
@@ -441,7 +442,7 @@ class DiffViewer extends React.Component<
 				{!hideLineNumbers && <td className={this.styles.codeFoldGutter} />}
 				<td
 					className={cn({
-						[this.styles.codeFoldGutter]: isUnifiedViewWithoutLineNumbers,
+						[this.styles.codeFoldGutter as string]: isUnifiedViewWithoutLineNumbers,
 					})}
 				/>
 
@@ -475,7 +476,10 @@ class DiffViewer extends React.Component<
 			disableWordDiff,
 			compareMethod,
 			linesOffset,
+			extraLinesSurroundingDiff = 3,
+			showDiffOnly = true,
 		} = this.props;
+
 		const { lineInformation, diffLines } = computeLineInformation(
 			oldValue,
 			newValue,
@@ -483,24 +487,24 @@ class DiffViewer extends React.Component<
 			compareMethod,
 			linesOffset,
 		);
-		const extraLines =
-			this.props.extraLinesSurroundingDiff < 0
-				? 0
-				: this.props.extraLinesSurroundingDiff;
+
+		const extraLines = Math.max(0, extraLinesSurroundingDiff);
 		let skippedLines: number[] = [];
+
 		return lineInformation.map(
 			(line: LineInformation, i: number): JSX.Element => {
 				const diffBlockStart = diffLines[0];
 				const currentPosition = diffBlockStart - i;
-				if (this.props.showDiffOnly) {
+
+				if (showDiffOnly) {
 					if (currentPosition === -extraLines) {
 						skippedLines = [];
 						diffLines.shift();
 					}
+
 					if (
 						line.left.type === DiffType.DEFAULT &&
-						(currentPosition > extraLines ||
-							typeof diffBlockStart === 'undefined') &&
+						(currentPosition > extraLines || typeof diffBlockStart === 'undefined') &&
 						!this.state.expandedBlocks.includes(diffBlockStart)
 					) {
 						skippedLines.push(i + 1);
@@ -510,9 +514,9 @@ class DiffViewer extends React.Component<
 								diffBlockStart,
 								line.left.lineNumber,
 								line.right.lineNumber,
-							);
+							) as JSX.Element;
 						}
-						return null;
+						return <React.Fragment key={i} />;
 					}
 				}
 
@@ -544,7 +548,6 @@ class DiffViewer extends React.Component<
 		const {
 			oldValue,
 			newValue,
-			useDarkTheme,
 			leftTitle,
 			rightTitle,
 			splitView,
@@ -555,7 +558,6 @@ class DiffViewer extends React.Component<
 			throw Error('"oldValue" and "newValue" should be strings');
 		}
 
-		this.styles = this.computeStyles(this.props.styles, useDarkTheme);
 		const nodes = this.renderDiff();
 		const colSpanOnSplitView = hideLineNumbers ? 2 : 3;
 		const colSpanOnInlineView = hideLineNumbers ? 2 : 4;
@@ -578,7 +580,7 @@ class DiffViewer extends React.Component<
 		return (
 			<table
 				className={cn(this.styles.diffContainer, {
-					[this.styles.splitView]: splitView,
+					[this.styles.splitView as string]: splitView,
 				})}>
 				<tbody>
 					{title}
@@ -590,4 +592,5 @@ class DiffViewer extends React.Component<
 }
 
 export default DiffViewer;
-export { ReactDiffViewerStylesOverride, DiffMethod };
+export type { ReactDiffViewerStylesOverride };
+export { DiffMethod };

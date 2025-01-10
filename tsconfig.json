@@ -1,19 +1,29 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "jsx": "react",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "target": "es5",
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
     "declaration": true,
-    "downlevelIteration": true,
-    "lib": ["es2017", "dom"],
-    "types": [
-      "mocha",
-      "node"
-    ]
+    "sourceMap": true,
+    "strict": true,
+    "jsx": "react",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "outDir": "lib",
+    "baseUrl": "src",
+    "paths": {
+      "*": ["*", "src/*"]
+    }
   },
-  "include": ["./src/*", "enzyme.js"],
-  "exclude": ["node_modules"],
+  "include": ["src"],
+  "exclude": ["node_modules", "lib", "examples", "test"]
 }

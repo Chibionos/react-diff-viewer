@@ -20,14 +20,14 @@ export enum DiffMethod {
 }
 
 export interface DiffInformation {
-	value?: string | DiffInformation[];
-	lineNumber?: number;
-	type?: DiffType;
+	value: string | DiffInformation[];
+	lineNumber: number;
+	type: DiffType;
 }
 
 export interface LineInformation {
-	left?: DiffInformation;
-	right?: DiffInformation;
+	left: DiffInformation;
+	right: DiffInformation;
 }
 
 export interface ComputedLineInformation {
@@ -36,8 +36,8 @@ export interface ComputedLineInformation {
 }
 
 export interface ComputedDiffInformation {
-	left?: DiffInformation[];
-	right?: DiffInformation[];
+	left: DiffInformation[];
+	right: DiffInformation[];
 }
 
 // See https://github.com/kpdecker/jsdiff/tree/v4.0.1#change-objects for more info on JsDiff
@@ -102,20 +102,20 @@ const computeDiff = (
 	};
 	diffArray.forEach(
 		({ added, removed, value }): DiffInformation => {
-			const diffInformation: DiffInformation = {};
+			const diffInformation: DiffInformation = {
+				value: value || '',
+				lineNumber: 0,
+				type: DiffType.DEFAULT,
+			};
 			if (added) {
 				diffInformation.type = DiffType.ADDED;
-				diffInformation.value = value;
 				computedDiff.right.push(diffInformation);
 			}
 			if (removed) {
 				diffInformation.type = DiffType.REMOVED;
-				diffInformation.value = value;
 				computedDiff.left.push(diffInformation);
 			}
 			if (!removed && !added) {
-				diffInformation.type = DiffType.DEFAULT;
-				diffInformation.value = value;
 				computedDiff.right.push(diffInformation);
 				computedDiff.left.push(diffInformation);
 			}
@@ -172,14 +172,22 @@ const computeLineInformation = (
 
 		return lines
 			.map(
-				(line: string, lineIndex): LineInformation => {
-					const left: DiffInformation = {};
-					const right: DiffInformation = {};
+				(line: string, lineIndex): LineInformation | null => {
+					const left: DiffInformation = {
+						value: '',
+						lineNumber: 0,
+						type: DiffType.DEFAULT,
+					};
+					const right: DiffInformation = {
+						value: '',
+						lineNumber: 0,
+						type: DiffType.DEFAULT,
+					};
 					if (
 						ignoreDiffIndexes.includes(`${diffIndex}-${lineIndex}`) ||
 						(evaluateOnlyFirstLine && lineIndex !== 0)
 					) {
-						return undefined;
+						return null;
 					}
 					if (added || removed) {
 						if (!diffLines.includes(counter)) {
@@ -252,7 +260,7 @@ const computeLineInformation = (
 					return { right, left };
 				},
 			)
-			.filter(Boolean);
+			.filter((line): line is LineInformation => line !== null);
 	};
 
 	diffArray.forEach(({ added, removed, value }: diff.Change, index): void => {

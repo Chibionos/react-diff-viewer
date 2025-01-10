@@ -46,6 +46,14 @@
       "parserOptions": {
         "ecmaVersion": 2020
       }
+    },
+    {
+      "files": ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
+      "extends": ["plugin:testing-library/react"],
+      "rules": {
+        "react/jsx-props-no-spreading": "off",
+        "import/no-extraneous-dependencies": ["error", { "devDependencies": true }]
+      }
     }
   ]
 }
